@@ -8,6 +8,8 @@ def main(page: ft.Page):
     page.title = "Lab05"
     page.horizontal_alignment = "center"
     page.theme_mode = ft.ThemeMode.DARK
+    page.window.width = 1250
+    page.window.height = 750
 
     # --- ALERT ---
     alert = AlertManager(page)
@@ -37,6 +39,10 @@ def main(page: ft.Page):
 
     # Tutti i TextField per le info necessarie per aggiungere una nuova automobile (marca, modello, anno, contatore posti)
     # TODO
+    input_marca = ft.TextField(label="Marca")
+    input_modello = ft.TextField(label="Modello")
+    input_anno = ft.TextField(label="Anno")
+
 
     # --- FUNZIONI APP ---
     def aggiorna_lista_auto():
@@ -59,6 +65,43 @@ def main(page: ft.Page):
 
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
     # TODO
+    def aggiungi_automobile(e):
+        marca = input_marca.value
+        modello = input_modello.value
+        if input_anno.value.isdigit() and len(input_anno.value) ==4:
+            anno = int(input_anno.value)
+        else:
+            alert.show_alert(f"❌ Errore: anno non valido!")
+            return None
+        if int(txtOut.value)<1 or int(txtOut.value)>9:
+            alert.show_alert(f"❌ Errore: numero posti non valido!")
+            return None
+        else:
+            posti = int(txtOut.value)
+        if modello=="":
+            alert.show_alert(f"❌ Errore: modello non valido!")
+            return None
+        if marca=="":
+            alert.show_alert(f"❌ Errore: marca non valida!")
+            return None
+        auto=autonoleggio.aggiungi_automobile(marca, modello, anno, posti)
+        stato = "✅" if auto.disponibile else "⛔"
+        lista_auto.controls.append(ft.Text(f"{stato} {auto}"))
+        input_marca.value=""
+        input_modello.value=""
+        input_anno.value=""
+        txtOut.value=0
+        page.update()
+
+    def handleAdd(e):
+        currentVal = txtOut.value
+        txtOut.value = currentVal + 1
+        txtOut.update()
+
+    def handleRemove(e):
+        currentVal = txtOut.value
+        txtOut.value = currentVal - 1
+        txtOut.update()
 
     # --- EVENTI ---
     toggle_cambia_tema = ft.Switch(label="Tema scuro", value=True, on_change=cambia_tema)
@@ -66,7 +109,16 @@ def main(page: ft.Page):
 
     # Bottoni per la gestione dell'inserimento di una nuova auto
     # TODO
-
+    btnMinus = ft.IconButton(icon=ft.Icons.REMOVE,
+                             icon_color="red",
+                             icon_size=12, on_click=handleRemove)
+    btnAdd = ft.IconButton(icon=ft.Icons.ADD,
+                           icon_color="green",
+                           icon_size=12, on_click=handleAdd)
+    txtOut = ft.TextField(width=50, disabled=True,
+                          value=0, border_color="green",
+                          text_align=ft.TextAlign.CENTER)
+    pulsante_aggiungi_auto = ft.ElevatedButton("Aggiungi automobile", on_click=aggiungi_automobile)
     # --- LAYOUT ---
     page.add(
         toggle_cambia_tema,
@@ -81,10 +133,17 @@ def main(page: ft.Page):
         ft.Row(spacing=200,
                controls=[input_responsabile, pulsante_conferma_responsabile],
                alignment=ft.MainAxisAlignment.CENTER),
+        ft.Divider(),
 
         # Sezione 3
         # TODO
-
+        ft.Text("Aggiungi una nuova automobile", size=20),
+        ft.Row(spacing=25,
+               controls=[input_marca,input_modello,input_anno,btnMinus, txtOut, btnAdd],
+               alignment=ft.MainAxisAlignment.CENTER),
+        ft.Row(spacing=50,
+               controls=[pulsante_aggiungi_auto],
+               alignment=ft.MainAxisAlignment.CENTER),
         # Sezione 4
         ft.Divider(),
         ft.Text("Automobili", size=20),
