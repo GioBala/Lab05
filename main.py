@@ -63,59 +63,51 @@ def main(page: ft.Page):
         txt_responsabile.value = f"Responsabile: {autonoleggio.responsabile}"
         page.update()
 
+
     # Handlers per la gestione dei bottoni utili all'inserimento di una nuova auto
     # TODO
     def aggiungi_automobile(e):
         marca = input_marca.value
         modello = input_modello.value
-        if modello=="":
-            alert.show_alert(f"❌ Errore: modello non valido!")
-            input_marca.value = ""
-            input_modello.value = ""
-            input_anno.value = ""
-            txtOut.value = 0
-            return None
         if marca=="":
             alert.show_alert(f"❌ Errore: marca non valida!")
-            input_marca.value = ""
-            input_modello.value = ""
-            input_anno.value = ""
-            txtOut.value = 0
+            pulisci_textbox()
+            return None
+        if modello=="":
+            alert.show_alert(f"❌ Errore: modello non valido!")
+            pulisci_textbox()
             return None
         if input_anno.value.isdigit() and len(input_anno.value) ==4:
             anno = int(input_anno.value)
         else:
             alert.show_alert(f"❌ Errore: anno non valido!")
-            input_marca.value = ""
-            input_modello.value = ""
-            input_anno.value = ""
-            txtOut.value = 0
+            pulisci_textbox()
             return None
         if int(txtOut.value)<1 or int(txtOut.value)>9:
             alert.show_alert(f"❌ Errore: numero posti non valido!")
-            input_marca.value = ""
-            input_modello.value = ""
-            input_anno.value = ""
-            txtOut.value = 0
+            pulisci_textbox()
             return None
         else:
             posti = int(txtOut.value)
         auto=autonoleggio.aggiungi_automobile(marca, modello, anno, posti)
         stato = "✅" if auto.disponibile else "⛔"
         lista_auto.controls.append(ft.Text(f"{stato} {auto}"))
-        input_marca.value=""
-        input_modello.value=""
+        pulisci_textbox()
+
+    def pulisci_textbox():
+        input_marca.value = ""
+        input_modello.value = ""
         input_anno.value=""
-        txtOut.value=0
+        txtOut.value = 0
         page.update()
 
     def handleAdd(e):
-        currentVal = txtOut.value
+        currentVal = int(txtOut.value)
         txtOut.value = currentVal + 1
         txtOut.update()
 
     def handleRemove(e):
-        currentVal = txtOut.value
+        currentVal = int(txtOut.value)
         txtOut.value = currentVal - 1
         txtOut.update()
 
